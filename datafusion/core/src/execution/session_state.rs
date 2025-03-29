@@ -1036,7 +1036,6 @@ impl SessionStateBuilder {
                     .into_iter()
                     .map(|f| (f.name().to_string(), f)),
             );
-
         self
     }
 

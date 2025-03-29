@@ -25,13 +25,14 @@
 #![cfg_attr(not(test), deny(clippy::clone_on_ref_ptr))]
 
 pub mod generate_series;
+pub mod memory_profile;
 
 use datafusion_catalog::TableFunction;
 use std::sync::Arc;
 
 /// Returns all default table functions
 pub fn all_default_table_functions() -> Vec<Arc<TableFunction>> {
-    vec![generate_series(), range()]
+    vec![generate_series(), range(), datafusion_temporary_files()]
 }
 
 /// Creates a singleton instance of a table function
@@ -59,3 +60,7 @@ macro_rules! create_udtf_function {
 
 create_udtf_function!(generate_series::GenerateSeriesFunc, "generate_series");
 create_udtf_function!(generate_series::RangeFunc, "range");
+create_udtf_function!(
+    memory_profile::TemporaryFilesFunc,
+    "datafusion_temporary_files"
+);

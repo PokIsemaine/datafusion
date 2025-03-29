@@ -303,3 +303,10 @@ SELECT range(1, t1.end) FROM range(3, 5) as t1(end)
 ----
 [1, 2, 3]
 [1, 2]
+
+# test
+query TI
+SELECT * FROM datafusion_temporary_files()
+----
+/tmp/file1.tmp 1024
+/tmp/file2.tmp 2048

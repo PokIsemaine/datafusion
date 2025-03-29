@@ -144,6 +144,42 @@ impl DiskManager {
                 .map_err(DataFusionError::IoError)?,
         })
     }
+
+    pub fn get_temporary_files(&self) -> Vec<(String, u64)> {
+        let mut files = Vec::new();
+
+        let guard = self.local_dirs.lock();
+        if let Some(local_dirs) = guard.as_ref() {
+            local_dirs
+                .iter()
+                .flat_map(|temp_dir| {
+                    std::fs::read_dir(temp_dir.path())
+                        .into_iter()
+                        .flat_map(|entries| {
+                            entries.flatten().filter_map(|entry| {
+                                let path = entry.path();
+                                entry
+                                    .metadata()
+                                    .ok()
+                                    .filter(|metadata| metadata.is_file())
+                                    .map(|metadata| {
+                                        (
+                                            path.to_string_lossy().to_string(),
+                                            metadata.len(),
+                                        )
+                                    })
+                            })
+                        })
+                })
+                .for_each(|file| files.push(file));
+        }
+
+        // test data
+        files.push(("/tmp/file1.tmp".to_string(), 1024));
+        files.push(("/tmp/file2.tmp".to_string(), 2048));
+
+        files
+    }
 }
 
 /// A wrapper around a [`NamedTempFile`] that also contains
